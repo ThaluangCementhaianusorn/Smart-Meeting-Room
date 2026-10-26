@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100" height="100">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1B2A41"/>
+      <stop offset="100%" stop-color="#2a4365"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#DC2626"/>
+      <stop offset="100%" stop-color="#991B1B"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="50%" stop-color="#EAB308"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Emblem Diamond Border Shape (OVEC style) -->
+  <polygon points="80,6 150,76 150,84 80,154 10,84 10,76" fill="url(#redGrad)" stroke="#B91C1C" stroke-width="2"/>
+  <polygon points="80,14 142,76 142,84 80,146 18,84 18,76" fill="#ffffff" />
+  <polygon points="80,20 136,76 136,84 80,140 24,84 24,76" fill="url(#blueGrad)" />
+
+  <!-- Radiating Rays / Wheel of Craftsmanship -->
+  <circle cx="80" cy="80" r="42" fill="none" stroke="#FDE047" stroke-width="2" stroke-dasharray="3,3"/>
+  <circle cx="80" cy="80" r="36" fill="#1B2A41" stroke="#FDE047" stroke-width="2.5"/>
+
+  <!-- Phra Wisanukam / Artisan Symbol: Plumb Line, T-square & Flame -->
+  <!-- Lotus Petals / Foundation -->
+  <path d="M56 102 C64 96, 96 96, 104 102 C96 108, 64 108, 56 102 Z" fill="url(#goldGrad)" />
+  <path d="M60 100 C70 92, 90 92, 100 100 C90 104, 70 104, 60 100 Z" fill="#FEF08A" />
+
+  <!-- Figure / Wisdom Crown -->
+  <circle cx="80" cy="62" r="10" fill="url(#goldGrad)" />
+  <!-- Crown / Chada -->
+  <path d="M80 40 L84 54 L76 54 Z" fill="url(#goldGrad)" stroke="#CA8A04" stroke-width="0.8"/>
+  <circle cx="80" cy="38" r="2.5" fill="#FEF08A"/>
+  
+  <!-- Craftsman Tools: Measuring Rule & Plumb-bob (สัญลักษณ์วิษณุกรรม / อาชีวศึกษา) -->
+  <line x1="68" y1="68" x2="92" y2="92" stroke="#FEF08A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="92" y1="68" x2="68" y2="92" stroke="#FEF08A" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="80" cy="80" r="6" fill="url(#goldGrad)" stroke="#B45309" stroke-width="1.5"/>
+
+  <!-- Inner Torch / Book of Knowledge -->
+  <path d="M72 88 L80 84 L88 88 L80 92 Z" fill="#FDE047"/>
+
+  <!-- Ribbon Banner Bottom -->
+  <path d="M38 126 L80 134 L122 126 L118 136 L80 144 L42 136 Z" fill="url(#redGrad)" stroke="#7F1D1D" stroke-width="1"/>
+  <!-- Gold Accent on Ribbon -->
+  <path d="M48 129 L80 135 L112 129" fill="none" stroke="#FDE047" stroke-width="1.2"/>
+</svg>

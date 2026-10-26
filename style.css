@@ -1,0 +1,186 @@
+/* 
+   Smart Meeting Room Booking System - Thaluang Cementhai Anusorn Technical College
+   Custom Styles & Official Government Print Format
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,300&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap');
+
+:root {
+  --primary-navy: #1B2A41;
+  --primary-navy-light: #2d4569;
+  --accent-orange: #E07A2F;
+  --accent-orange-hover: #c96822;
+  --bg-slate: #F8FAFC;
+}
+
+body {
+  font-family: 'Kanit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #1e293b;
+  background-color: var(--bg-slate);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* FullCalendar styling overrides */
+.fc {
+  font-family: 'Kanit', sans-serif !important;
+}
+.fc .fc-toolbar-title {
+  font-size: 1.25rem !important;
+  font-weight: 600;
+  color: var(--primary-navy);
+}
+.fc .fc-button-primary {
+  background-color: var(--primary-navy) !important;
+  border-color: var(--primary-navy) !important;
+  font-family: 'Kanit', sans-serif !important;
+  font-weight: 400;
+  padding: 0.35rem 0.75rem !important;
+  border-radius: 0.5rem !important;
+  box-shadow: none !important;
+}
+.fc .fc-button-primary:hover {
+  background-color: var(--primary-navy-light) !important;
+  border-color: var(--primary-navy-light) !important;
+}
+.fc .fc-button-primary:disabled {
+  background-color: #94a3b8 !important;
+  border-color: #94a3b8 !important;
+}
+.fc .fc-button-active {
+  background-color: var(--accent-orange) !important;
+  border-color: var(--accent-orange) !important;
+}
+.fc-theme-standard td, .fc-theme-standard th {
+  border-color: #e2e8f0 !important;
+}
+.fc-day-today {
+  background-color: #fff7ed !important;
+}
+.fc-event {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 0.82rem;
+  border: none !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.fc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Print Styles for Official Government Form (A4) */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 15mm 10mm 15mm;
+  }
+  
+  body * {
+    visibility: hidden;
+  }
+  
+  #official-print-document, #official-print-document * {
+    visibility: visible;
+  }
+  
+  #official-print-document {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: white;
+    font-family: 'Sarabun', 'TH Sarabun New', 'Kanit', sans-serif !important;
+    color: black !important;
+    font-size: 14pt;
+    line-height: 1.5;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Official Government Form Screen & Print Styling */
+.gov-form-container {
+  font-family: 'Sarabun', 'TH Sarabun New', 'Kanit', sans-serif;
+  color: #111827;
+  line-height: 1.55;
+  background: white;
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 15mm 18mm;
+  box-sizing: border-box;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.dotted-line {
+  border-bottom: 1px dotted #4b5563;
+  display: inline-block;
+  padding-bottom: 1px;
+  color: #111827;
+  font-weight: 600;
+}
+
+.gov-checkbox {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 1.25rem;
+  font-size: 14pt;
+}
+
+.gov-checkbox-box {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #1f2937;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.signature-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.signature-table td {
+  border: 1px solid #1f2937;
+  padding: 10px 14px;
+  vertical-align: top;
+  width: 50%;
+  text-align: center;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}

@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบจองห้องประชุมออนไลน์ | วิทยาลัยเทคนิคท่าหลวงซิเมนต์ไทยอนุสรณ์</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#1B2A41',
+              navylight: '#2d4569',
+              orange: '#E07A2F',
+              orangehover: '#c96822',
+              bg: '#F8FAFC'
+            }
+          },
+          fontFamily: {
+            kanit: ['Kanit', 'sans-serif'],
+            sarabun: ['Sarabun', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts: Kanit & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- FullCalendar CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Firebase Compat CDN (Optional Cloud Firestore sync) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-brand-bg font-kanit text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- App Wrapper -->
+  <div class="flex flex-1 overflow-hidden h-screen">
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="w-72 bg-brand-navy text-white flex flex-col flex-shrink-0 transition-transform duration-300 z-30 fixed inset-y-0 left-0 md:static md:translate-x-0 -translate-x-full shadow-xl">
+      <!-- Sidebar Brand Header -->
+      <div class="p-5 border-b border-slate-700/60 flex items-center space-x-3">
+        <img src="assets/logo.svg" alt="College Logo" class="w-12 h-12 object-contain filter drop-shadow">
+        <div>
+          <h1 class="text-sm font-bold tracking-wide leading-tight text-white">วท.ท่าหลวงซิเมนต์ไทยฯ</h1>
+          <p class="text-[11px] text-slate-400 font-light mt-0.5">ระบบจองห้องประชุมออนไลน์</p>
+          <span class="inline-block mt-1 text-[10px] px-2 py-0.5 bg-brand-orange/20 text-brand-orange border border-brand-orange/40 rounded-full font-medium">Smart Booking System</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <a href="#dashboard" data-tab="dashboard" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-xl text-white bg-brand-orange shadow-md transition group">
+          <svg class="w-5 h-5 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          แดชบอร์ดสรุปภาพรวม
+        </a>
+
+        <a href="#calendar" data-tab="calendar" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-300 hover:bg-slate-800 transition group">
+          <svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          ปฏิทินสถานะห้องประชุม
+        </a>
+
+        <a href="#booking" data-tab="booking" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-300 hover:bg-slate-800 transition group">
+          <svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          ยื่นคำขอจองห้องประชุม
+        </a>
+
+        <a href="#approval" data-tab="approval" class="nav-link flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl text-slate-300 hover:bg-slate-800 transition group">
+          <div class="flex items-center">
+            <svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>ตรวจสอบและอนุมัติ</span>
+          </div>
+          <span id="badge-appr-pending-side" class="text-xs bg-brand-orange text-white px-2 py-0.5 rounded-full font-bold">4 ขั้น</span>
+        </a>
+
+        <a href="#reports" data-tab="reports" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-300 hover:bg-slate-800 transition group">
+          <svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          รายงานและพิมพ์เอกสารราชการ
+        </a>
+
+        <a href="#settings" data-tab="settings" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-300 hover:bg-slate-800 transition group">
+          <svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          การตั้งค่า & Webhook
+        </a>
+      </nav>
+
+      <!-- Sidebar Officer Info Box -->
+      <div class="p-4 m-3 bg-slate-800/80 rounded-xl border border-slate-700 text-xs">
+        <p class="text-slate-400 font-semibold mb-1">งานศูนย์ดิจิทัลและสื่อสารองค์กร</p>
+        <div class="space-y-1 text-slate-300">
+          <p>• จนท.ตรวจห้อง: นายวัชรพงศ์ โสภา</p>
+          <p>• หน.งาน: นายเอกราช เขียวทอง</p>
+          <p>• ผู้พิจารณา: นายชาตรี เริงชัยภูมิ</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+
+      <!-- Top Header -->
+      <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 sm:px-6 z-20 flex-shrink-0">
+        <div class="flex items-center space-x-3">
+          <button id="mobile-menu-btn" class="md:hidden text-slate-600 hover:text-slate-900 focus:outline-none p-1.5 rounded-lg hover:bg-slate-100">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <h2 class="text-lg font-bold text-brand-navy hidden sm:block">วิทยาลัยเทคนิคท่าหลวงซิเมนต์ไทยอนุสรณ์</h2>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="flex items-center space-x-3 sm:space-x-4">
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button id="notif-bell-btn" class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-full relative transition focus:outline-none">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+              <span id="notif-badge" class="hidden absolute top-1 right-1 w-4 h-4 bg-brand-orange text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">0</span>
+            </button>
+
+            <!-- Notifications Dropdown -->
+            <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 overflow-hidden animate-fade-in">
+              <div class="p-3.5 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                <span class="font-bold text-sm text-slate-800">การแจ้งเตือนแบบเรียลไทม์</span>
+                <button id="notif-mark-all-read" class="text-xs text-brand-orange hover:underline">อ่านทั้งหมด</button>
+              </div>
+              <div id="notif-list-container" class="max-h-80 overflow-y-auto divide-y divide-gray-100">
+                <!-- Notifications inject here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Booking CTA -->
+          <button onclick="switchTab('booking')" class="flex items-center px-4 py-2 bg-brand-orange hover:bg-brand-orangehover text-white text-xs sm:text-sm font-semibold rounded-xl shadow-sm transition">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            จองห้องประชุมทันที
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Main Viewport -->
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/70">
+
+        <!-- ================= TAB 1: DASHBOARD ================= -->
+        <section id="tab-dashboard" class="tab-content space-y-6">
+          <!-- Welcome Banner -->
+          <div class="bg-gradient-to-r from-brand-navy via-slate-800 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+            <div class="relative z-10 max-w-2xl">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-brand-orange text-white uppercase tracking-wider">
+                ระบบบริหารจัดการห้องประชุมอัจฉริยะ
+              </span>
+              <h2 class="text-2xl sm:text-3xl font-bold mt-3 leading-snug">
+                ยินดีต้อนรับสู่ระบบจองห้องประชุมออนไลน์
+              </h2>
+              <p class="text-sm text-slate-300 mt-2 leading-relaxed">
+                วิทยาลัยเทคนิคท่าหลวงซิเมนต์ไทยอนุสรณ์ ตรวจสอบคิวห้องประชุมแบบ Real-time, ยื่นแบบคำขอออนไลน์, อนุมัติตามลำดับขั้น และพิมพ์แบบฟอร์มเอกสารราชการได้ทันที
+              </p>
+            </div>
+            <div class="absolute right-0 bottom-0 opacity-10 translate-x-8 translate-y-8">
+              <img src="assets/logo.svg" alt="watermark" class="w-72 h-72">
+            </div>
+          </div>
+
+          <!-- KPI Cards Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <!-- Card 1 -->
+            <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div>
+                <p class="text-xs text-slate-500 font-medium">การใช้งานวันนี้</p>
+                <h3 id="kpi-today-count" class="text-2xl font-bold text-slate-900 mt-0.5">0</h3>
+                <span class="text-[11px] text-emerald-600 font-medium">รายการที่อนุมัติแล้ว</span>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <div>
+                <p class="text-xs text-slate-500 font-medium">รอดำเนินการตรวจสอบ/อนุมัติ</p>
+                <h3 id="kpi-pending-count" class="text-2xl font-bold text-amber-600 mt-0.5">0</h3>
+                <span class="text-[11px] text-slate-400">รอเจ้าหน้าที่/ผู้บริหาร</span>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <div>
+                <p class="text-xs text-slate-500 font-medium">อนุมัติเรียบร้อย</p>
+                <h3 id="kpi-approved-count" class="text-2xl font-bold text-emerald-600 mt-0.5">0</h3>
+                <span class="text-[11px] text-emerald-600 font-medium">พร้อมใช้งาน</span>
+              </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              </div>
+              <div>
+                <p class="text-xs text-slate-500 font-medium">คำขอทั้งหมดในระบบ</p>
+                <h3 id="kpi-total-count" class="text-2xl font-bold text-brand-navy mt-0.5">0</h3>
+                <span class="text-[11px] text-slate-400">สถิติสะสม</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Room Usage Bar Chart -->
+            <div class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-slate-800 text-base">สถิติการขอใช้ห้องประชุมแต่ละห้อง</h3>
+                <span class="text-xs text-slate-400">แยกตามสถานที่</span>
+              </div>
+              <div class="h-64">
+                <canvas id="chart-room-usage"></canvas>
+              </div>
+            </div>
+
+            <!-- Equipment Usage Doughnut Chart -->
+            <div class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-slate-800 text-base">สถิติการขอใช้อุปกรณ์/สิ่งอำนวยความสะดวก</h3>
+                <span class="text-xs text-slate-400">แยกตามประเภท</span>
+              </div>
+              <div class="h-64">
+                <canvas id="chart-equipment-usage"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Bookings Table -->
+          <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h3 class="font-bold text-slate-800 text-base">รายการจองห้องประชุมล่าสุด</h3>
+                <p class="text-xs text-slate-500">อัปเดตแบบ Real-time ตามสถานะคำขอ</p>
+              </div>
+              <button onclick="switchTab('reports')" class="text-xs text-brand-orange hover:underline font-semibold">
+                ดูทั้งหมด →
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50/70 border-b border-gray-100 text-xs text-slate-500 font-semibold uppercase">
+                    <th class="py-3 px-4">รหัส</th>
+                    <th class="py-3 px-4">ผู้ขอใช้ / หน่วยงาน</th>
+                    <th class="py-3 px-4">ห้องประชุม</th>
+                    <th class="py-3 px-4">วัน-เวลาที่ขอใช้</th>
+                    <th class="py-3 px-4">สถานะ</th>
+                    <th class="py-3 px-4 text-right">การจัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-bookings-tbody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 2: CALENDAR ================= -->
+        <section id="tab-calendar" class="tab-content hidden space-y-6">
+          <div class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
+            <!-- Filter Bar & Legend -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-gray-100">
+              <div>
+                <h3 class="text-lg font-bold text-slate-900">ปฏิทินแสดงสถานะการใช้ห้องประชุม</h3>
+                <p class="text-xs text-slate-500">คลิกที่รายการเพื่อดูรายละเอียดผู้จองและอุปกรณ์ที่ขอใช้</p>
+              </div>
+
+              <!-- Filter Selector -->
+              <div class="flex items-center space-x-3">
+                <label for="calendar-room-filter" class="text-xs font-semibold text-slate-600">กรองห้อง:</label>
+                <select id="calendar-room-filter" class="text-xs border border-gray-300 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-orange">
+                  <option value="">-- แสดงทุกห้องประชุม --</option>
+                  <option value="หอประชุมอดิเรกสาร">หอประชุมอดิเรกสาร</option>
+                  <option value="ห้องประชุมสักทอง">ห้องประชุมสักทอง</option>
+                  <option value="ห้องประชุมหน้าห้องผู้อำนวยการ">ห้องประชุมหน้าห้องผู้อำนวยการ</option>
+                  <option value="ห้องประชุม (กาแฟ)">ห้องประชุม (กาแฟ)</option>
+                  <option value="อาคารโดมเอนกประสงค์">อาคารโดมเอนกประสงค์</option>
+                  <option value="ห้องคอมพิวเตอร์กลาง (ห้องโสต)">ห้องคอมพิวเตอร์กลาง (ห้องโสต)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Color Palette Legend -->
+            <div class="flex flex-wrap items-center gap-3 py-3 text-xs border-b border-gray-100">
+              <span class="text-slate-500 font-semibold">สัญลักษณ์สี:</span>
+              <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-600 mr-1.5"></span>หอประชุมอดิเรกสาร</span>
+              <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-amber-600 mr-1.5"></span>ห้องสักทอง</span>
+              <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-purple-600 mr-1.5"></span>หน้าห้อง ผอ.</span>
+              <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-rose-600 mr-1.5"></span>ห้องกาแฟ</span>
+              <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-emerald-600 mr-1.5"></span>โดมเอนกประสงค์</span>
+              <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-cyan-600 mr-1.5"></span>ห้องคอมฯ โสต</span>
+            </div>
+
+            <!-- Calendar Container -->
+            <div id="meeting-calendar" class="pt-4 min-h-[650px]"></div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 3: BOOKING FORM ================= -->
+        <section id="tab-booking" class="tab-content hidden max-w-4xl mx-auto space-y-6">
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200/80 shadow-md">
+            <!-- Form Header -->
+            <div class="text-center pb-6 border-b border-gray-200">
+              <img src="assets/logo.svg" alt="College Logo" class="w-16 h-16 mx-auto mb-2 object-contain">
+              <h2 class="text-xl font-bold text-brand-navy">แบบคำขออนุญาตใช้ห้องประชุม</h2>
+              <p class="text-sm text-slate-600">วิทยาลัยเทคนิคท่าหลวงซิเมนต์ไทยอนุสรณ์</p>
+              <p class="text-xs text-slate-400 mt-1">กรอกข้อมูลให้ครบถ้วนเพื่อส่งให้งานศูนย์ดิจิทัลและสื่อสารองค์กรตรวจสอบ</p>
+            </div>
+
+            <!-- Real-Time Conflict Alert Banner -->
+            <div id="conflict-alert-banner" class="hidden mt-4"></div>
+
+            <!-- Main Form -->
+            <form id="meeting-booking-form" class="mt-6 space-y-6 text-sm">
+
+              <!-- Section 1: ข้อมูลผู้ขอใช้ -->
+              <div class="bg-slate-50 p-5 rounded-2xl border border-gray-200/60 space-y-4">
+                <h3 class="font-bold text-brand-navy text-base flex items-center">
+                  <span class="w-6 h-6 rounded-full bg-brand-navy text-white text-xs flex items-center justify-center mr-2">1</span>
+                  ข้อมูลผู้ขออนุญาตใช้ห้องประชุม
+                </h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">วันที่เขียนคำขอ <span class="text-red-500">*</span></label>
+                    <input type="date" id="form-requestDate" required class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">คำนำหน้า <span class="text-red-500">*</span></label>
+                    <select id="form-prefix" required class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none bg-white">
+                      <option value="นาย">นาย</option>
+                      <option value="นาง">นาง</option>
+                      <option value="นางสาว">นางสาว</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อ - นามสกุล <span class="text-red-500">*</span></label>
+                    <input type="text" id="form-fullName" required placeholder="เช่น สมชาย ใจดี" class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ตำแหน่ง</label>
+                    <input type="text" id="form-position" placeholder="เช่น ครู, หัวหน้างาน..." class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">หน่วยงาน / สาขาวิชา <span class="text-red-500">*</span></label>
+                    <input type="text" id="form-department" required placeholder="เช่น แผนกวิชาช่างยนต์" class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">หมายเลขโทรศัพท์ <span class="text-red-500">*</span></label>
+                    <input type="tel" id="form-phone" required placeholder="เช่น 081-234-5678" class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 2: ข้อมูลห้องประชุมที่ขอใช้ -->
+              <div class="bg-slate-50 p-5 rounded-2xl border border-gray-200/60 space-y-4">
+                <div class="flex items-center justify-between">
+                  <h3 class="font-bold text-brand-navy text-base flex items-center">
+                    <span class="w-6 h-6 rounded-full bg-brand-navy text-white text-xs flex items-center justify-center mr-2">2</span>
+                    มีความประสงค์ขออนุญาตใช้ห้องประชุม
+                  </h3>
+                  <span class="text-xs text-brand-orange font-medium">ระบบตรวจเวลาชนกันอัตโนมัติ</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  <label class="flex items-center p-3 rounded-xl border border-gray-200 bg-white hover:bg-orange-50/50 cursor-pointer transition">
+                    <input type="radio" name="form-room" value="หอประชุมอดิเรกสาร" required class="w-4 h-4 text-brand-orange focus:ring-brand-orange">
+                    <span class="ml-2.5 font-medium text-slate-800">หอประชุมอดิเรกสาร</span>
+                  </label>
+
+                  <label class="flex items-center p-3 rounded-xl border border-gray-200 bg-white hover:bg-orange-50/50 cursor-pointer transition">
+                    <input type="radio" name="form-room" value="ห้องประชุมสักทอง" class="w-4 h-4 text-brand-orange focus:ring-brand-orange">
+                    <span class="ml-2.5 font-medium text-slate-800">ห้องประชุมสักทอง</span>
+                  </label>
+
+                  <label class="flex items-center p-3 rounded-xl border border-gray-200 bg-white hover:bg-orange-50/50 cursor-pointer transition">
+                    <input type="radio" name="form-room" value="ห้องประชุมหน้าห้องผู้อำนวยการ" class="w-4 h-4 text-brand-orange focus:ring-brand-orange">
+                    <span class="ml-2.5 font-medium text-slate-800">ห้องประชุมหน้าห้อง ผอ.</span>
+                  </label>
+
+                  <label class="flex items-center p-3 rounded-xl border border-gray-200 bg-white hover:bg-orange-50/50 cursor-pointer transition">
+                    <input type="radio" name="form-room" value="ห้องประชุม (กาแฟ)" class="w-4 h-4 text-brand-orange focus:ring-brand-orange">
+                    <span class="ml-2.5 font-medium text-slate-800">ห้องประชุม (กาแฟ)</span>
+                  </label>
+
+                  <label class="flex items-center p-3 rounded-xl border border-gray-200 bg-white hover:bg-orange-50/50 cursor-pointer transition">
+                    <input type="radio" name="form-room" value="อาคารโดมเอนกประสงค์" class="w-4 h-4 text-brand-orange focus:ring-brand-orange">
+                    <span class="ml-2.5 font-medium text-slate-800">อาคารโดมเอนกประสงค์</span>
+                  </label>
+
+                  <label class="flex items-center p-3 rounded-xl border border-gray-200 bg-white hover:bg-orange-50/50 cursor-pointer transition">
+                    <input type="radio" name="form-room" value="ห้องคอมพิวเตอร์กลาง (ห้องโสต)" class="w-4 h-4 text-brand-orange focus:ring-brand-orange">
+                    <span class="ml-2.5 font-medium text-slate-800">ห้องคอมฯ กลาง (โสต)</span>
+                  </label>
+
+                  <label class="flex items-center p-3 rounded-xl border border-gray-200 bg-white hover:bg-orange-50/50 cursor-pointer transition sm:col-span-2 md:col-span-3">
+                    <input type="radio" name="form-room" value="อื่นๆ" class="w-4 h-4 text-brand-orange focus:ring-brand-orange">
+                    <span class="ml-2.5 font-medium text-slate-800">อื่นๆ (ระบุสถานที่เพิ่มเติม)</span>
+                  </label>
+                </div>
+
+                <div id="other-room-container" class="hidden mt-2">
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">ระบุชื่อห้อง/สถานที่</label>
+                  <input type="text" id="form-roomOther" placeholder="เช่น ลานกิจกรรมหน้าเสาธง, ห้องประชุมแผนก..." class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Section 3: รายละเอียดการใช้งาน & วันเวลา -->
+              <div class="bg-slate-50 p-5 rounded-2xl border border-gray-200/60 space-y-4">
+                <h3 class="font-bold text-brand-navy text-base flex items-center">
+                  <span class="w-6 h-6 rounded-full bg-brand-navy text-white text-xs flex items-center justify-center mr-2">3</span>
+                  รายละเอียดและกำหนดการใช้งาน
+                </h3>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">เพื่อใช้ในการดำเนินงาน เรื่อง <span class="text-red-500">*</span></label>
+                  <textarea id="form-purpose" required rows="2" placeholder="ระบุชื่องาน กิจกรรม หรือวาระการประชุม..." class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ตั้งแต่วันที่ <span class="text-red-500">*</span></label>
+                    <input type="date" id="form-startDate" required class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ถึงวันที่ <span class="text-red-500">*</span></label>
+                    <input type="date" id="form-endDate" required class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ตั้งแต่เวลา <span class="text-red-500">*</span></label>
+                    <input type="time" id="form-startTime" required value="08:30" class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ถึงเวลา <span class="text-red-500">*</span></label>
+                    <input type="time" id="form-endTime" required value="16:30" class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none">
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">จำนวนผู้เข้าใช้ (โดยประมาณ) <span class="text-red-500">*</span></label>
+                  <div class="relative w-48">
+                    <input type="number" id="form-attendees" required min="1" max="2000" placeholder="จำนวนคน" class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none pr-10">
+                    <span class="absolute right-3 top-2 text-xs text-slate-400">คน</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 4: ครุภัณฑ์/อุปกรณ์/สิ่งอำนวยความสะดวก -->
+              <div class="bg-slate-50 p-5 rounded-2xl border border-gray-200/60 space-y-4">
+                <h3 class="font-bold text-brand-navy text-base flex items-center">
+                  <span class="w-6 h-6 rounded-full bg-brand-navy text-white text-xs flex items-center justify-center mr-2">4</span>
+                  ครุภัณฑ์ / อุปกรณ์ / สิ่งอำนวยความสะดวกที่ขอใช้
+                </h3>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-slate-100 cursor-pointer">
+                    <input type="checkbox" id="form-fac-projector" class="w-4 h-4 rounded text-brand-orange focus:ring-brand-orange">
+                    <span class="text-slate-700">เครื่องฉายภาพ (Projector)</span>
+                  </label>
+                  <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-slate-100 cursor-pointer">
+                    <input type="checkbox" id="form-fac-sound" class="w-4 h-4 rounded text-brand-orange focus:ring-brand-orange">
+                    <span class="text-slate-700">ระบบเสียง</span>
+                  </label>
+                  <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-slate-100 cursor-pointer">
+                    <input type="checkbox" id="form-fac-mic" class="w-4 h-4 rounded text-brand-orange focus:ring-brand-orange">
+                    <span class="text-slate-700">ไมโครโฟน</span>
+                  </label>
+                  <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-slate-100 cursor-pointer">
+                    <input type="checkbox" id="form-fac-ac" class="w-4 h-4 rounded text-brand-orange focus:ring-brand-orange">
+                    <span class="text-slate-700">เครื่องปรับอากาศ</span>
+                  </label>
+                  <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-slate-100 cursor-pointer">
+                    <input type="checkbox" id="form-fac-net" class="w-4 h-4 rounded text-brand-orange focus:ring-brand-orange">
+                    <span class="text-slate-700">อินเทอร์เน็ต</span>
+                  </label>
+                  <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-slate-100 cursor-pointer">
+                    <input type="checkbox" id="form-fac-tables" class="w-4 h-4 rounded text-brand-orange focus:ring-brand-orange">
+                    <span class="text-slate-700">โต๊ะ/เก้าอี้เพิ่มเติม</span>
+                  </label>
+                </div>
+
+                <div id="fac-tables-count-container" class="hidden">
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">จำนวนโต๊ะ/เก้าอี้เพิ่มเติม (ตัว)</label>
+                  <input type="number" id="form-fac-tables-count" min="1" placeholder="ระบุจำนวนตัว" class="w-40 px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">อื่นๆ (ระบุความต้องการเพิ่มเติม)</label>
+                  <input type="text" id="form-fac-other-desc" placeholder="เช่น โพเดียม, สายพ่วงไฟ, จอทีวีเสริม..." class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Section 5: คำรับรอง -->
+              <div class="bg-amber-50/70 p-4 rounded-2xl border border-amber-200/80">
+                <label class="flex items-start space-x-3 cursor-pointer">
+                  <input type="checkbox" id="form-agreement" required class="w-5 h-5 mt-0.5 rounded text-brand-orange focus:ring-brand-orange">
+                  <span class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+                    ข้าพเจ้าขอรับรองว่าจะดูแลรักษาทรัพย์สินของทางราชการ และปฏิบัติตามระเบียบของวิทยาลัยเทคนิคท่าหลวงซิเมนต์ไทยอนุสรณ์โดยเคร่งครัด
+                  </span>
+                </label>
+              </div>
+
+              <!-- Form Submit Actions -->
+              <div class="flex items-center justify-end space-x-3 pt-4 border-t border-gray-100">
+                <button type="reset" class="px-5 py-2.5 rounded-xl border border-gray-300 text-slate-600 hover:bg-gray-100 font-medium transition">
+                  ล้างข้อมูล
+                </button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-orange hover:bg-brand-orangehover text-white font-semibold shadow-md transition flex items-center">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  บันทึกและส่งคำขออนุญาต
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ================= TAB 4: APPROVAL WORKFLOW CENTER ================= -->
+        <section id="tab-approval" class="tab-content hidden space-y-6">
+          <div class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-100">
+              <div>
+                <h3 class="text-lg font-bold text-slate-900">ศูนย์ตรวจสอบและอนุมัติตามลำดับขั้น</h3>
+                <p class="text-xs text-slate-500">สำหรับเจ้าหน้าที่ศูนย์ดิจิทัลและสื่อสารองค์กร และฝ่ายบริหาร</p>
+              </div>
+
+              <!-- Role filter pills -->
+              <div class="flex flex-wrap gap-2 text-xs">
+                <button onclick="setApprovalFilter('all')" class="appr-tab-btn px-3 py-1.5 rounded-xl bg-brand-navy text-white font-medium" data-filter="all">
+                  ทั้งหมด (<span id="badge-appr-all">0</span>)
+                </button>
+                <button onclick="setApprovalFilter('pending_check')" class="appr-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium" data-filter="pending_check">
+                  1. รอตรวจห้อง (<span id="badge-appr-step1">0</span>)
+                </button>
+                <button onclick="setApprovalFilter('endorsed')" class="appr-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium" data-filter="endorsed">
+                  2. รอรับรอง (<span id="badge-appr-step2">0</span>)
+                </button>
+                <button onclick="setApprovalFilter('approved')" class="appr-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium" data-filter="approved">
+                  3. รออนุมัติ (<span id="badge-appr-step3">0</span>)
+                </button>
+                <button onclick="setApprovalFilter('history')" class="appr-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium" data-filter="history">
+                  ประวัติอนุมัติแล้ว
+                </button>
+              </div>
+            </div>
+
+            <!-- Workflow Visual Guide Banner -->
+            <div class="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-full bg-amber-500 text-white font-bold flex items-center justify-center flex-shrink-0">1</span>
+                <div>
+                  <p class="font-semibold text-slate-800">ยื่นคำขอใหม่</p>
+                  <p class="text-[11px] text-slate-400">ผู้ขอใช้ยื่นแบบฟอร์ม</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-full bg-blue-500 text-white font-bold flex items-center justify-center flex-shrink-0">2</span>
+                <div>
+                  <p class="font-semibold text-slate-800">จนท.ตรวจความพร้อม</p>
+                  <p class="text-[11px] text-slate-400">นายวัชรพงศ์ โสภา</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-full bg-purple-500 text-white font-bold flex items-center justify-center flex-shrink-0">3</span>
+                <div>
+                  <p class="font-semibold text-slate-800">หัวหน้างานรับรอง</p>
+                  <p class="text-[11px] text-slate-400">นายเอกราช เขียวทอง</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center flex-shrink-0">4</span>
+                <div>
+                  <p class="font-semibold text-slate-800">ผู้พิจารณาอนุมัติ</p>
+                  <p class="text-[11px] text-slate-400">นายชาตรี เริงชัยภูมิ (รอง ผอ.)</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cards Container -->
+            <div id="approval-cards-container" class="grid grid-cols-1 gap-4 mt-6">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 5: REPORTS & OFFICIAL PRINT ================= -->
+        <section id="tab-reports" class="tab-content hidden space-y-6">
+          <div class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-gray-100">
+              <div>
+                <h3 class="text-lg font-bold text-slate-900">รายงานข้อมูลและพิมพ์แบบฟอร์มราชการ</h3>
+                <p class="text-xs text-slate-500">ค้นหา กรองข้อมูล และส่งออกเอกสาร Excel/CSV หรือพิมพ์แบบคำขอ A4</p>
+              </div>
+
+              <!-- Export CSV Button -->
+              <button onclick="exportBookingsToCSV()" class="flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-sm transition">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                ส่งออก Excel / CSV
+              </button>
+            </div>
+
+            <!-- Search and Filter Controls -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">ค้นหา (รหัส, ชื่อ, แผนก, เรื่อง)</label>
+                <input type="text" id="report-search" oninput="renderReportsTable()" placeholder="พิมพ์เพื่อค้นหา..." class="w-full text-xs px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">ห้องประชุม</label>
+                <select id="report-room-filter" onchange="renderReportsTable()" class="w-full text-xs px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none bg-white">
+                  <option value="">-- ทุกห้องประชุม --</option>
+                  <option value="หอประชุมอดิเรกสาร">หอประชุมอดิเรกสาร</option>
+                  <option value="ห้องประชุมสักทอง">ห้องประชุมสักทอง</option>
+                  <option value="ห้องประชุมหน้าห้องผู้อำนวยการ">ห้องประชุมหน้าห้องผู้อำนวยการ</option>
+                  <option value="ห้องประชุม (กาแฟ)">ห้องประชุม (กาแฟ)</option>
+                  <option value="อาคารโดมเอนกประสงค์">อาคารโดมเอนกประสงค์</option>
+                  <option value="ห้องคอมพิวเตอร์กลาง (ห้องโสต)">ห้องคอมพิวเตอร์กลาง (ห้องโสต)</option>
+                  <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">สถานะ</label>
+                <select id="report-status-filter" onchange="renderReportsTable()" class="w-full text-xs px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none bg-white">
+                  <option value="">-- ทุกสถานะ --</option>
+                  <option value="pending_check">รอตรวจสอบห้อง</option>
+                  <option value="checked_ready">พร้อมใช้งาน (รอรับรอง)</option>
+                  <option value="endorsed">รับรองแล้ว (รออนุมัติ)</option>
+                  <option value="approved">อนุมัติเรียบร้อย</option>
+                  <option value="checked_not_ready">ไม่พร้อมใช้งาน</option>
+                  <option value="rejected">ไม่อนุมัติ</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto border border-gray-200 rounded-xl">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-gray-200 text-xs text-slate-600 font-semibold uppercase">
+                    <th class="py-3 px-4">รหัสคำขอ</th>
+                    <th class="py-3 px-4">ผู้ขอใช้</th>
+                    <th class="py-3 px-4">ห้องประชุม</th>
+                    <th class="py-3 px-4">วัน-เวลา</th>
+                    <th class="py-3 px-4">เรื่อง</th>
+                    <th class="py-3 px-4">สถานะ</th>
+                    <th class="py-3 px-4 text-right">เครื่องมือ</th>
+                  </tr>
+                </thead>
+                <tbody id="reports-table-tbody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 6: SETTINGS ================= -->
+        <section id="tab-settings" class="tab-content hidden max-w-3xl mx-auto space-y-6">
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200/80 shadow-md">
+            <h3 class="text-lg font-bold text-brand-navy mb-1">การตั้งค่าระบบ & การแจ้งเตือน Webhook</h3>
+            <p class="text-xs text-slate-500 mb-6">เชื่อมต่อการแจ้งเตือนแบบ Real-time เข้า Telegram Bot, Discord, หรือ Google Chat ทันทีที่มีคำขอใหม่</p>
+
+            <form id="settings-webhook-form" class="space-y-5 text-sm">
+              <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-gray-200">
+                <div>
+                  <h4 class="font-semibold text-slate-800">เปิดใช้งานระบบแจ้งเตือนภายนอก (Webhook)</h4>
+                  <p class="text-xs text-slate-500">ส่งข้อความอัตโนมัติเมื่อมีการจอง หรือสถานะเปลี่ยน</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="setting-webhook-enabled" class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
+                </label>
+              </div>
+
+              <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-gray-200">
+                <div>
+                  <h4 class="font-semibold text-slate-800">เสียงเตือนแจ้งเตือน (Audio Chime)</h4>
+                  <p class="text-xs text-slate-500">เล่นเสียงสังเคราะห์ผ่าน Web Audio API เมื่อมีรายการใหม่</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="setting-sound-enabled" class="sr-only peer" checked>
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
+                </label>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">แพลตฟอร์มแจ้งเตือน</label>
+                <select id="setting-platform" class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none bg-white">
+                  <option value="telegram">Telegram Bot API</option>
+                  <option value="discord">Discord Webhook</option>
+                  <option value="googlechat">Google Chat Webhook</option>
+                  <option value="custom">Custom Webhook (JSON POST)</option>
+                </select>
+              </div>
+
+              <!-- Telegram fields -->
+              <div id="setting-group-telegram" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Telegram Bot Token</label>
+                  <input type="text" id="setting-botToken" placeholder="เช่น 123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ" class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none font-mono text-xs">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Telegram Chat ID / Group ID</label>
+                  <input type="text" id="setting-chatId" placeholder="เช่น -100123456789 หรือ @your_channel" class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none font-mono text-xs">
+                </div>
+              </div>
+
+              <!-- Webhook URL field for Discord / Google Chat / Custom -->
+              <div id="setting-group-webhook" class="hidden">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Webhook URL</label>
+                <input type="url" id="setting-webhookUrl" placeholder="https://discord.com/api/webhooks/... หรือ Google Chat incoming webhook" class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-orange focus:outline-none font-mono text-xs">
+              </div>
+
+              <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                <button type="button" id="btn-test-notification" class="px-4 py-2 border border-gray-300 text-slate-600 hover:bg-slate-100 rounded-xl text-xs font-medium">
+                  ทดสอบเสียงและการแจ้งเตือน
+                </button>
+                <button type="submit" class="px-6 py-2.5 bg-brand-navy hover:bg-brand-navylight text-white rounded-xl text-xs font-semibold shadow-sm transition">
+                  บันทึกการตั้งค่า
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: OFFICIAL A4 PRINT PREVIEW ================= -->
+  <div id="print-preview-modal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 overflow-y-auto no-print">
+    <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[95vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="px-6 py-4 bg-brand-navy text-white flex items-center justify-between flex-shrink-0">
+        <div class="flex items-center space-x-2">
+          <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          <span class="font-bold text-sm">ตัวอย่างแบบคำขออนุญาตใช้ห้องประชุม (ขนาด A4)</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="printOfficialForm()" class="px-4 py-1.5 bg-brand-orange hover:bg-brand-orangehover text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            สั่งพิมพ์ (Print / Save as PDF)
+          </button>
+          <button onclick="closePrintModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body: Scrollable A4 Document Container -->
+      <div class="p-6 overflow-y-auto bg-slate-200/80 flex justify-center">
+        <div id="official-print-document">
+          <!-- Official Thai Government Form A4 HTML injected here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: DETAILS ================= -->
+  <div id="details-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative">
+      <button onclick="closeDetailsModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+      <div id="details-modal-content">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Load App Scripts -->
+  <script src="js/notifications.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    function setApprovalFilter(filter) {
+      currentApprovalFilter = filter;
+      document.querySelectorAll('.appr-tab-btn').forEach(btn => {
+        if (btn.dataset.filter === filter) {
+          btn.className = "appr-tab-btn px-3 py-1.5 rounded-xl bg-brand-navy text-white font-medium";
+        } else {
+          btn.className = "appr-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium";
+        }
+      });
+      renderApprovalList();
+    }
+  </script>
+</body>
+</html>
